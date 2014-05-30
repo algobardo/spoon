@@ -27,6 +27,7 @@ import static com.google.common.base.Charsets.UTF_8;
 
 /** Renders a {@link com.squareup.spoon.SpoonSummary} as static HTML to an output directory. */
 public final class HtmlRenderer {
+
   public static final String INDEX_FILENAME = "index.html";
   private static final String STATIC_DIRECTORY = "static";
   private static final String[] STATIC_ASSETS = {
@@ -34,6 +35,16 @@ public final class HtmlRenderer {
     "jquery.nivo.slider.pack.js", "nivo-slider.css", "icon-animated.png", "icon-devices.png",
     "icon-log.png", "ceiling_android.png", "arrows.png", "bullets.png", "loading.gif"
   };
+
+  private static boolean prettify = true;
+
+  public static void setPrettify(boolean prettify) {
+      HtmlRenderer.prettify = prettify;
+  }
+  public static boolean getPrettify() {
+        return HtmlRenderer.prettify;
+  }
+
 
   private final SpoonSummary summary;
   private final Gson gson;

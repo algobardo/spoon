@@ -29,7 +29,6 @@ final class HtmlUtils {
     }
   };
 
-
   static String deviceDetailsToString(DeviceDetails details) {
     if (details == null) return null;
 
@@ -100,6 +99,8 @@ final class HtmlUtils {
 
   /** Convert a method name from {@code testThisThing_DoesThat} to "This Thing, Does That". */
   static String prettifyMethodName(String methodName) {
+    if (!HtmlRenderer.getPrettify()) return methodName;
+
     if (!methodName.startsWith("test")) {
       throw new IllegalArgumentException(
           "Method name '" + methodName + "' does not start with 'test'.");
@@ -133,6 +134,7 @@ final class HtmlUtils {
 
   /** Convert an image name from {@code 87243508_this-here-is-it} to "This Here Is It". */
   static String prettifyImageName(String imageName) {
+    if (!HtmlRenderer.getPrettify()) return imageName;
     imageName = FilenameUtils.removeExtension(imageName);
 
     // Remove the timestamp information.

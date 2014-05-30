@@ -120,9 +120,11 @@ final class HtmlIndex {
       String methodName = test.getMethodName();
       String classSimpleName = HtmlUtils.getClassSimpleName(className);
       String prettyMethodName = HtmlUtils.prettifyMethodName(methodName);
+      String durationMills = Long.toString(testResult.getDuration());
       String testId = HtmlUtils.testClassAndMethodToId(className, methodName);
       String status = HtmlUtils.getStatusCssClass(testResult);
-      return new TestResult(serial, classSimpleName, prettyMethodName, testId, status);
+      return new TestResult(serial, classSimpleName, prettyMethodName, testId,
+              status, durationMills);
     }
 
     public final String serial;
@@ -130,14 +132,16 @@ final class HtmlIndex {
     public final String prettyMethodName;
     public final String testId;
     public final String status;
+    public final String durationMills;
 
     TestResult(String serial, String classSimpleName, String prettyMethodName, String testId,
-        String status) {
+        String status, String durationMills) {
       this.serial = serial;
       this.classSimpleName = classSimpleName;
       this.prettyMethodName = prettyMethodName;
       this.testId = testId;
       this.status = status;
+      this.durationMills = durationMills;
     }
 
     @Override public int compareTo(TestResult other) {

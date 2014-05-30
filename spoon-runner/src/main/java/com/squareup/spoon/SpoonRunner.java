@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+
 import org.apache.commons.io.FileUtils;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -389,6 +390,10 @@ public final class SpoonRunner {
 
     @Parameter(names = { "-h", "--help" }, description = "Command help", help = true, hidden = true)
     public boolean help;
+
+    @Parameter(names = { "--noprettify" },
+            description = "Disable pretty method name", help = true, hidden = false)
+    public boolean pretty;
   }
 
   private static File cleanFile(String path) {
@@ -433,6 +438,8 @@ public final class SpoonRunner {
       jc.usage();
       return;
     }
+
+    HtmlRenderer.setPrettify(parsedArgs.pretty);
 
     SpoonRunner spoonRunner = new SpoonRunner.Builder() //
         .setTitle(parsedArgs.title)
