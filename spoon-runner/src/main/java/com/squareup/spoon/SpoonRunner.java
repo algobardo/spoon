@@ -393,7 +393,7 @@ public final class SpoonRunner {
 
     @Parameter(names = { "--noprettify" },
             description = "Disable pretty method name", help = true, hidden = false)
-    public boolean pretty;
+    public boolean nopretty;
   }
 
   private static File cleanFile(String path) {
@@ -439,7 +439,7 @@ public final class SpoonRunner {
       return;
     }
 
-    HtmlRenderer.setPrettify(parsedArgs.pretty);
+    HtmlRenderer.setPrettify(!parsedArgs.nopretty);
 
     SpoonRunner spoonRunner = new SpoonRunner.Builder() //
         .setTitle(parsedArgs.title)
