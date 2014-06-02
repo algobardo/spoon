@@ -100,6 +100,7 @@ Options:
     --sdk               Path to Android SDK
     --test-apk          Test application APK
     --title             Execution title
+    --subpackage-name   Subpackage run (fully-qualified)
     --class-name        Test class name to run (fully-qualified)
     --method-name       Test method name to run (must also use --class-name)
     --no-animations     Disable animated gif generation
