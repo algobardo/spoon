@@ -50,6 +50,7 @@ public final class SpoonDeviceRunner {
   private final boolean debug;
   private final boolean noAnimations;
   private final int adbTimeout;
+  private final String subpackageName;
   private final String className;
   private final String methodName;
   private final IRemoteAndroidTestRunner.TestSize testSize;
@@ -77,8 +78,8 @@ public final class SpoonDeviceRunner {
    */
   SpoonDeviceRunner(File sdk, File apk, File testApk, File output, String serial, boolean debug,
       boolean noAnimations, int adbTimeout, String classpath,
-      SpoonInstrumentationInfo instrumentationInfo, String className, String methodName,
-      IRemoteAndroidTestRunner.TestSize testSize) {
+      SpoonInstrumentationInfo instrumentationInfo, String subpackageName, String className, 
+      String methodName, IRemoteAndroidTestRunner.TestSize testSize) {
     this.sdk = sdk;
     this.apk = apk;
     this.testApk = testApk;
@@ -86,6 +87,7 @@ public final class SpoonDeviceRunner {
     this.debug = debug;
     this.noAnimations = noAnimations;
     this.adbTimeout = adbTimeout;
+    this.subpackageName = subpackageName;
     this.className = className;
     this.methodName = methodName;
     this.testSize = testSize;
@@ -187,6 +189,8 @@ public final class SpoonDeviceRunner {
     try {
       logDebug(debug, "About to actually run tests for [%s]", serial);
       RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(testPackage, testRunner, device);
+      if(!Strings.isNullOrEmpty(subpackageName))
+        runner.setTestPackageName(subpackageName);
       runner.setMaxtimeToOutputResponse(adbTimeout);
       if (!Strings.isNullOrEmpty(className)) {
         if (Strings.isNullOrEmpty(methodName)) {

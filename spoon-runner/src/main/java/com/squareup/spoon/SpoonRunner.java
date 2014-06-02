@@ -41,6 +41,7 @@ public final class SpoonRunner {
   private final boolean debug;
   private final boolean noAnimations;
   private final int adbTimeout;
+  private final String subpackageName;
   private final String className;
   private final String methodName;
   private final Set<String> serials;
@@ -50,7 +51,7 @@ public final class SpoonRunner {
 
   private SpoonRunner(String title, File androidSdk, File applicationApk, File instrumentationApk,
       File output, boolean debug, boolean noAnimations, int adbTimeout, Set<String> serials,
-      String classpath, String className, String methodName,
+      String classpath, String subpackageName, String className, String methodName,
       IRemoteAndroidTestRunner.TestSize testSize, boolean failIfNoDeviceConnected) {
     this.title = title;
     this.androidSdk = androidSdk;
@@ -60,6 +61,7 @@ public final class SpoonRunner {
     this.debug = debug;
     this.noAnimations = noAnimations;
     this.adbTimeout = adbTimeout;
+    this.subpackageName = subpackageName;
     this.className = className;
     this.methodName = methodName;
     this.classpath = classpath;
@@ -197,7 +199,7 @@ public final class SpoonRunner {
 
   private SpoonDeviceRunner getTestRunner(String serial, SpoonInstrumentationInfo testInfo) {
     return new SpoonDeviceRunner(androidSdk, applicationApk, instrumentationApk, output, serial,
-        debug, noAnimations, adbTimeout, classpath, testInfo, className, methodName, testSize);
+        debug, noAnimations, adbTimeout, classpath, testInfo, subpackageName, className, methodName, testSize);
   }
 
   /** Build a test suite for the specified devices and configuration. */
@@ -210,6 +212,7 @@ public final class SpoonRunner {
     private boolean debug = false;
     private Set<String> serials;
     private String classpath = System.getProperty("java.class.path");
+    private String subpackageName;
     private String className;
     private String methodName;
     private boolean noAnimations;
@@ -303,6 +306,11 @@ public final class SpoonRunner {
       return this;
     }
 
+    public Builder setSubpackageName(String subpackageName) {
+      this.subpackageName = subpackageName;
+      return this;
+    }
+
     public Builder setClassName(String className) {
       this.className = className;
       return this;
@@ -336,7 +344,7 @@ public final class SpoonRunner {
       }
 
       return new SpoonRunner(title, androidSdk, applicationApk, instrumentationApk, output, debug,
-          noAnimations, adbTimeout, serials, classpath, className, methodName, testSize,
+          noAnimations, adbTimeout, serials, classpath, subpackageName, className, methodName, testSize,
           failIfNoDeviceConnected);
     }
   }
@@ -353,6 +361,9 @@ public final class SpoonRunner {
         converter = FileConverter.class, required = true)
     public File testApk;
 
+    @Parameter(names = { "--subpackage-name" }, description = "Sub-package to run (fully-qualified)")
+    public String subpackageName;
+    
     @Parameter(names = { "--class-name" }, description = "Test class name to run (fully-qualified)")
     public String className;
 
@@ -452,6 +463,7 @@ public final class SpoonRunner {
         .setTestSize(parsedArgs.size)
         .setAdbTimeout(parsedArgs.adbTimeoutSeconds * 1000)
         .setFailIfNoDeviceConnected(parsedArgs.failIfNoDeviceConnected)
+        .setSubpackageName(parsedArgs.subpackageName)
         .setClassName(parsedArgs.className)
         .setMethodName(parsedArgs.methodName)
         .useAllAttachedDevices()
