@@ -98,8 +98,8 @@ public final class DeviceResult {
       newResults = unmodifiableMap(newResults);
 
       ArrayList<StackTrace> newExceptions = new ArrayList<StackTrace>();
-      newExceptions.addAll(this.exceptions);
-      newExceptions.addAll(dres.exceptions);
+      if(this.exceptions != null) newExceptions.addAll(this.exceptions);
+      if(dres.exceptions != null) newExceptions.addAll(dres.exceptions);
 
       return new DeviceResult(installFailed,installMessage,
               deviceDetails,newResults,started,newDuration,newExceptions);

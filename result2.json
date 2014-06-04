@@ -19,7 +19,7 @@
         [
           {
             "className": "org.catrobat.catroid.uitest.ui.activity.MainMenuActivityTest",
-            "methodName": "testBottombarElementsVisibilty1"
+            "methodName": "testBottombarElementsVisibilty"
           },
           {
             "status": "PASS",
@@ -31,7 +31,7 @@
         [
           {
             "className": "org.catrobat.catroid.uitest.ui.activity.MainMenuActivityTest2",
-            "methodName": "testBottombarElementsVisibilty1"
+            "methodName": "testBottombarElementsVisibilty"
           },
           {
             "status": "PASS",

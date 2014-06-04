@@ -409,7 +409,7 @@ public final class SpoonRunner {
               "Run in aggregation mode, aggregating previous results", help = true)
     public List<String> aggregate;
 
-    @Parameter(names = { "--aggregate-out" }, description =
+    @Parameter(names = { "--aggregateout" }, description =
               "The directory where to put the aggregation result", help = true)
     public String aggregate_out;
   }
@@ -457,7 +457,7 @@ public final class SpoonRunner {
       return;
     }
     if (!parsedArgs.aggregate.isEmpty() || parsedArgs.aggregate_out != null || parsedArgs.aggregate_out != ""){
-        if (!parsedArgs.aggregate.isEmpty() && parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "") {
+        if (!(!parsedArgs.aggregate.isEmpty() && parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "")) {
             System.err.println("Parameters missing for aggregation");
             return;
         }
@@ -480,6 +480,7 @@ public final class SpoonRunner {
         catch (FileNotFoundException err){
             System.err.println(err);
         }
+        return;
     }
 
     HtmlRenderer.setPrettify(!parsedArgs.nopretty);
