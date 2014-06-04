@@ -1,0 +1,46 @@
+{
+  "title": "Desc",
+  "started": 1401876270421,
+  "duration": 2473,
+  "results": {
+    "emulator-5554": {
+      "installFailed": false,
+      "deviceDetails": {
+        "model": "Android SDK built for x86",
+        "manufacturer": "unknown",
+        "version": "4.4.2",
+        "apiLevel": 19,
+        "language": "en",
+        "region": "US",
+        "isEmulator": true,
+        "avdName": "LatestOne"
+      },
+      "testResults": [
+        [
+          {
+            "className": "org.catrobat.catroid.uitest.ui.activity.MainMenuActivityTest",
+            "methodName": "testBottombarElementsVisibilty"
+          },
+          {
+            "status": "PASS",
+            "duration": 4,
+            "screenshots": [],
+            "log": []
+          }
+        ],
+        [
+          {
+            "className": "org.catrobat.catroid.uitest.ui.activity.MainMenuActivityTest2",
+            "methodName": "testBottombarElementsVisibilty"
+          },
+          {
+            "status": "PASS",
+            "duration": 4,
+            "screenshots": [],
+            "log": []
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -5,8 +5,10 @@ import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Sets;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableMap;
@@ -51,6 +53,22 @@ public final class SpoonSummary {
   /** Individual device results by serial number. */
   public Map<String, DeviceResult> getResults() {
     return results;
+  }
+
+  /** Aggregate to SpoonSummaries into one */
+  public SpoonSummary aggregate(SpoonSummary ss){
+    Map<String, DeviceResult> results = new HashMap<String, DeviceResult>();
+
+      if(Sets.intersection(ss.results.keySet(),this.results.keySet()).size() != this.results.keySet().size())
+          throw new RuntimeException("The two results are incomparable, they need to be on the same device set");
+
+      Map<String, DeviceResult> newResults = new TreeMap<String, DeviceResult>();
+      for(String dev : ss.results.keySet()){
+          newResults.put(dev,this.results.get(dev).aggregate(ss.results.get(dev)));
+      }
+      newResults = unmodifiableMap(newResults);
+
+      return new SpoonSummary("Aggregation",this.testSize,this.started,this.duration+ss.duration,newResults);
   }
 
   static class Builder {

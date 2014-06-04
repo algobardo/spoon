@@ -1,14 +1,12 @@
 package com.squareup.spoon;
 
 import com.squareup.spoon.misc.StackTrace;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.sun.org.apache.xalan.internal.lib.ExsltSets;
+
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Sets;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
@@ -23,6 +21,7 @@ public final class DeviceResult {
   private final long started;
   private final long duration;
   private final List<StackTrace> exceptions;
+
 
   private DeviceResult(boolean installFailed, String installMessage, DeviceDetails deviceDetails,
       Map<DeviceTest, DeviceTestResult> testResults, long started, long duration,
@@ -78,6 +77,32 @@ public final class DeviceResult {
   /** Exceptions that occurred during execution. */
   public List<StackTrace> getExceptions() {
     return exceptions;
+  }
+
+  /* Aggregate two devices results into one, assuming no DeviceTest has been run twice */
+  public DeviceResult aggregate (DeviceResult dres){
+      if(this.installFailed || dres.installFailed)
+          throw new RuntimeException("The two results are incomparable, at least one fails to install");
+        //this.installMessage = installMessage &&
+        //this.deviceDetails = deviceDetails;
+      //this.started = started;
+
+      if(!Sets.intersection(dres.testResults.keySet(),testResults.keySet()).isEmpty())
+        throw new RuntimeException("The two results are incomparable, they share at least one method");
+
+      long newDuration = this.duration + dres.duration;
+
+      Map<DeviceTest, DeviceTestResult> newResults = new TreeMap<DeviceTest, DeviceTestResult>();
+      newResults.putAll(this.testResults);
+      newResults.putAll(dres.testResults);
+      newResults = unmodifiableMap(newResults);
+
+      ArrayList<StackTrace> newExceptions = new ArrayList<StackTrace>();
+      if(this.exceptions != null) newExceptions.addAll(this.exceptions);
+      if(dres.exceptions != null) newExceptions.addAll(dres.exceptions);
+
+      return new DeviceResult(installFailed,installMessage,
+              deviceDetails,newResults,started,newDuration,newExceptions);
   }
 
   static class Builder {

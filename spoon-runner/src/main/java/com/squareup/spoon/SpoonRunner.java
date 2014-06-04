@@ -10,11 +10,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.squareup.spoon.html.HtmlRenderer;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.io.FileUtils;
@@ -354,11 +352,11 @@ public final class SpoonRunner {
     public String title = DEFAULT_TITLE;
 
     @Parameter(names = { "--apk" }, description = "Application APK",
-        converter = FileConverter.class, required = true)
+        converter = FileConverter.class)
     public File apk;
 
     @Parameter(names = { "--test-apk" }, description = "Test application APK",
-        converter = FileConverter.class, required = true)
+        converter = FileConverter.class)
     public File testApk;
 
     @Parameter(names = { "--subpackage-name" }, description = "Sub-package to run (fully-qualified)")
@@ -405,6 +403,15 @@ public final class SpoonRunner {
     @Parameter(names = { "--noprettify" },
             description = "Disable pretty method name", help = true, hidden = false)
     public boolean nopretty;
+
+
+    @Parameter(names = { "--aggregate" }, description =
+              "Run in aggregation mode, aggregating previous results", help = true)
+    public List<String> aggregate;
+
+    @Parameter(names = { "--aggregateout" }, description =
+              "The directory where to put the aggregation result", help = true)
+    public String aggregate_out;
   }
 
   private static File cleanFile(String path) {
@@ -448,6 +455,32 @@ public final class SpoonRunner {
     if (parsedArgs.help) {
       jc.usage();
       return;
+    }
+    if (!parsedArgs.aggregate.isEmpty() || parsedArgs.aggregate_out != null || parsedArgs.aggregate_out != ""){
+        if (!(!parsedArgs.aggregate.isEmpty() && parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "")) {
+            System.err.println("Parameters missing for aggregation");
+            return;
+        }
+        try {
+            List<HtmlRenderer> renders = new LinkedList<HtmlRenderer>();
+            for (String el : parsedArgs.aggregate)
+                renders.add(new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out)));
+
+            HtmlRenderer prev = null;
+            for (HtmlRenderer rn : renders ){
+                if(prev == null)
+                    prev = rn;
+                else {
+                    prev = prev.aggregate(rn,new File(parsedArgs.aggregate_out));
+                }
+            }
+
+            prev.render();
+        }
+        catch (FileNotFoundException err){
+            System.err.println(err);
+        }
+        return;
     }
 
     HtmlRenderer.setPrettify(!parsedArgs.nopretty);

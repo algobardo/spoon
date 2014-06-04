@@ -10,12 +10,8 @@ import com.squareup.spoon.DeviceResult;
 import com.squareup.spoon.DeviceTest;
 import com.squareup.spoon.DeviceTestResult;
 import com.squareup.spoon.SpoonSummary;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +50,17 @@ public final class HtmlRenderer {
     this.summary = summary;
     this.gson = gson;
     this.output = output;
+  }
+
+  public HtmlRenderer(Gson gson, File input, File output) throws FileNotFoundException{
+
+      FileReader fr = new FileReader(input);
+      this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
+      this.gson = gson;
+      this.output = output;
+  }
+  public HtmlRenderer aggregate(HtmlRenderer htmlr,File newoutput){
+      return new HtmlRenderer(this.summary.aggregate(htmlr.summary),gson,newoutput);
   }
 
   public void render() {
