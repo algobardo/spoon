@@ -456,6 +456,9 @@ public final class SpoonRunner {
       jc.usage();
       return;
     }
+
+    HtmlRenderer.setPrettify(!parsedArgs.nopretty);
+
     if ((parsedArgs.aggregate != null &&  !parsedArgs.aggregate.isEmpty()) || 
       (parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "")){
         //Entering aggregation mode
@@ -485,8 +488,6 @@ public final class SpoonRunner {
         }
         return;
     }
-
-    HtmlRenderer.setPrettify(!parsedArgs.nopretty);
 
     SpoonRunner spoonRunner = new SpoonRunner.Builder() //
         .setTitle(parsedArgs.title)
