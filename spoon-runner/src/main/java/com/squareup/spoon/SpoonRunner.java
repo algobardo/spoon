@@ -457,10 +457,10 @@ public final class SpoonRunner {
       return;
     }
     if ((parsedArgs.aggregate != null &&  !parsedArgs.aggregate.isEmpty()) || 
-      (parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != ""){
+      (parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "")){
         //Entering aggregation mode
         if (parsedArgs.aggregate == null || parsedArgs.aggregate.isEmpty() ||
-         parsedArgs.aggregate_out == null || parsedArgs.aggregate_out == "")) {
+         parsedArgs.aggregate_out == null || parsedArgs.aggregate_out == "") {
             System.err.println("Parameters missing for aggregation");
             return;
         }
