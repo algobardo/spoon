@@ -469,14 +469,17 @@ public final class SpoonRunner {
         }
         try {
             List<HtmlRenderer> renders = new LinkedList<HtmlRenderer>();
-            for (String el : parsedArgs.aggregate)
+            for (String el : parsedArgs.aggregate){
+                logDebug(debug,"Adding result file to aggregate: %s", el);
                 renders.add(new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out)));
+            }
 
             HtmlRenderer prev = null;
             for (HtmlRenderer rn : renders ){
                 if(prev == null)
                     prev = rn;
                 else {
+                    logDebug(debug,"Aggregating: %s with %s", prev, en);
                     prev = prev.aggregate(rn,new File(parsedArgs.aggregate_out));
                 }
             }

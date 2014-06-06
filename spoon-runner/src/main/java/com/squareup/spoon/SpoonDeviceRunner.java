@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import com.squareup.spoon.adapters.TestIdentifierAdapter;
+import com.android.tradefed.device.CollectingOutputReceiver;
 
 import static com.android.ddmlib.FileListingService.FileEntry;
 import static com.squareup.spoon.Spoon.SPOON_SCREENSHOTS;
@@ -162,6 +163,10 @@ public final class SpoonDeviceRunner {
     logDebug(debug, "[%s] setDeviceDetails %s", serial, deviceDetails);
 
     try {
+      // First clear previous spurious application state
+      CollectingOutputReceiver clearOutput = new CollectingOutputReceiver();
+      device.executeShellCommand("pm clear " + appPackage, clearOutput);
+      logInfo("[%s] cleared the previous application state, if any: ", serial, clearOutput.getOutput());
       // Now install the main application and the instrumentation application.
       String installError = device.installPackage(apk.getAbsolutePath(), true);
       if (installError != null) {
