@@ -89,7 +89,10 @@ public final class DeviceResult {
 
       Sets.SetView<DeviceTest> commontest = Sets.intersection(dres.testResults.keySet(),testResults.keySet());
       if(!commontest.isEmpty()){
-        throw new RuntimeException("The two results are incomparable, they share at least one method: " + commontest);
+        throw new RuntimeException("The two results are incomparable, when comparing " + this + 
+          " with tests " + this.testResults.keySet() + 
+          " againsts "+ dres + "with tests " + dres.testResults.keySet() 
+          +": they share at least one method: " + commontest);
       }
 
       long newDuration = this.duration + dres.duration;
