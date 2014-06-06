@@ -168,7 +168,7 @@ public final class SpoonDeviceRunner {
       try{
         CollectingOutputReceiver clearOutput = new CollectingOutputReceiver();
         device.executeShellCommand("pm clear " + appPackage, clearOutput);
-        logInfo("[%s] cleared the previous application state, if any: ", serial, clearOutput.getOutput());
+        logInfo("[%s] cleared the previous application ( %s ) state, if any: ", serial, appPackage, clearOutput.getOutput());
       }
       catch(Exception e){
         result.addException(e);
