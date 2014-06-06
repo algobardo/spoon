@@ -87,8 +87,10 @@ public final class DeviceResult {
         //this.deviceDetails = deviceDetails;
       //this.started = started;
 
-      if(!Sets.intersection(dres.testResults.keySet(),testResults.keySet()).isEmpty())
-        throw new RuntimeException("The two results are incomparable, they share at least one method");
+      Sets.SetView<DeviceTest> commontest = Sets.intersection(dres.testResults.keySet(),testResults.keySet());
+      if(!commontest.isEmpty()){
+        throw new RuntimeException("The two results are incomparable, they share at least one method: " commontest);
+      }
 
       long newDuration = this.duration + dres.duration;
 
