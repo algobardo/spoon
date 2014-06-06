@@ -7,6 +7,7 @@ import com.android.ddmlib.SyncService;
 import com.android.ddmlib.logcat.LogCatMessage;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
+import com.android.ddmlib.CollectingOutputReceiver;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -24,7 +25,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import com.squareup.spoon.adapters.TestIdentifierAdapter;
-import com.android.tradefed.device.CollectingOutputReceiver;
+
 
 import static com.android.ddmlib.FileListingService.FileEntry;
 import static com.squareup.spoon.Spoon.SPOON_SCREENSHOTS;
@@ -164,9 +165,14 @@ public final class SpoonDeviceRunner {
 
     try {
       // First clear previous spurious application state
-      CollectingOutputReceiver clearOutput = new CollectingOutputReceiver();
-      device.executeShellCommand("pm clear " + appPackage, clearOutput);
-      logInfo("[%s] cleared the previous application state, if any: ", serial, clearOutput.getOutput());
+      try{
+        CollectingOutputReceiver clearOutput = new CollectingOutputReceiver();
+        device.executeShellCommand("pm clear " + appPackage, clearOutput);
+        logInfo("[%s] cleared the previous application state, if any: ", serial, clearOutput.getOutput());
+      }
+      catch(Exception e){
+        result.addException(e);
+      }
       // Now install the main application and the instrumentation application.
       String installError = device.installPackage(apk.getAbsolutePath(), true);
       if (installError != null) {
