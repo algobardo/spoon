@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static com.squareup.spoon.SpoonLogger.logInfo;
 
 /** Represents the results of executing instrumentation tests on a single device. */
 public final class DeviceResult {
@@ -89,7 +90,7 @@ public final class DeviceResult {
 
       Sets.SetView<DeviceTest> commontest = Sets.intersection(dres.testResults.keySet(),testResults.keySet());
       if(!commontest.isEmpty()){
-        throw new RuntimeException("The two results are incomparable, when comparing " + this + 
+        logInfo("The two results are incomparable, when comparing " + this + 
           " with tests " + this.testResults.keySet() + 
           " againsts "+ dres + "with tests " + dres.testResults.keySet() 
           +": they share at least one method: " + commontest);

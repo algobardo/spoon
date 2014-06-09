@@ -42,6 +42,7 @@ public final class SpoonRunner {
   private final String subpackageName;
   private final String className;
   private final String methodName;
+  private final boolean noInstall;
   private final Set<String> serials;
   private final String classpath;
   private final IRemoteAndroidTestRunner.TestSize testSize;
@@ -50,7 +51,7 @@ public final class SpoonRunner {
   private SpoonRunner(String title, File androidSdk, File applicationApk, File instrumentationApk,
       File output, boolean debug, boolean noAnimations, int adbTimeout, Set<String> serials,
       String classpath, String subpackageName, String className, String methodName,
-      IRemoteAndroidTestRunner.TestSize testSize, boolean failIfNoDeviceConnected) {
+      IRemoteAndroidTestRunner.TestSize testSize, boolean noInstall, boolean failIfNoDeviceConnected) {
     this.title = title;
     this.androidSdk = androidSdk;
     this.applicationApk = applicationApk;
@@ -64,6 +65,7 @@ public final class SpoonRunner {
     this.methodName = methodName;
     this.classpath = classpath;
     this.testSize = testSize;
+    this.noInstall = noInstall;
     this.serials = ImmutableSet.copyOf(serials);
     this.failIfNoDeviceConnected = failIfNoDeviceConnected;
   }
@@ -197,7 +199,7 @@ public final class SpoonRunner {
 
   private SpoonDeviceRunner getTestRunner(String serial, SpoonInstrumentationInfo testInfo) {
     return new SpoonDeviceRunner(androidSdk, applicationApk, instrumentationApk, output, serial,
-        debug, noAnimations, adbTimeout, classpath, testInfo, subpackageName, className, methodName, testSize);
+        debug, noAnimations, adbTimeout, classpath, testInfo, subpackageName, className, methodName, noInstall, testSize);
   }
 
   /** Build a test suite for the specified devices and configuration. */
@@ -214,6 +216,7 @@ public final class SpoonRunner {
     private String className;
     private String methodName;
     private boolean noAnimations;
+    private boolean noInstall;
     private IRemoteAndroidTestRunner.TestSize testSize;
     private int adbTimeout;
     private boolean failIfNoDeviceConnected;
@@ -261,6 +264,13 @@ public final class SpoonRunner {
       this.debug = debug;
       return this;
     }
+
+    /** Whether or not install the application */
+    public Builder setNoInstall(boolean noInstall) {
+      this.noInstall = noInstall;
+      return this;
+    }
+
 
     /** Whether or not animations are enabled. */
     public Builder setNoAnimations(boolean noAnimations) {
@@ -343,7 +353,7 @@ public final class SpoonRunner {
 
       return new SpoonRunner(title, androidSdk, applicationApk, instrumentationApk, output, debug,
           noAnimations, adbTimeout, serials, classpath, subpackageName, className, methodName, testSize,
-          failIfNoDeviceConnected);
+          noInstall, failIfNoDeviceConnected);
     }
   }
 
@@ -404,7 +414,6 @@ public final class SpoonRunner {
             description = "Disable pretty method name", help = true, hidden = false)
     public boolean nopretty;
 
-
     @Parameter(names = { "--aggregate" }, description =
               "Run in aggregation mode, aggregating previous results", help = true)
     public List<String> aggregate;
@@ -412,6 +421,10 @@ public final class SpoonRunner {
     @Parameter(names = { "--aggregateout" }, description =
               "The directory where to put the aggregation result", help = true)
     public String aggregate_out;
+
+    @Parameter(names = { "--noinstall" }, description =
+              "Avoid installing the app", help = true)
+    public boolean noinstall;
   }
 
   private static File cleanFile(String path) {
@@ -506,6 +519,7 @@ public final class SpoonRunner {
         .setSubpackageName(parsedArgs.subpackageName)
         .setClassName(parsedArgs.className)
         .setMethodName(parsedArgs.methodName)
+        .setNoInstall(parsedArgs.noinstall)
         .useAllAttachedDevices()
         .build();
 

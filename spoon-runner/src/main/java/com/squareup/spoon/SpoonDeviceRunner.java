@@ -51,6 +51,7 @@ public final class SpoonDeviceRunner {
   private final String serial;
   private final boolean debug;
   private final boolean noAnimations;
+  private final boolean noInstall;
   private final int adbTimeout;
   private final String subpackageName;
   private final String className;
@@ -81,7 +82,7 @@ public final class SpoonDeviceRunner {
   SpoonDeviceRunner(File sdk, File apk, File testApk, File output, String serial, boolean debug,
       boolean noAnimations, int adbTimeout, String classpath,
       SpoonInstrumentationInfo instrumentationInfo, String subpackageName, String className, 
-      String methodName, IRemoteAndroidTestRunner.TestSize testSize) {
+      String methodName, boolean noInstall, IRemoteAndroidTestRunner.TestSize testSize) {
     this.sdk = sdk;
     this.apk = apk;
     this.testApk = testApk;
@@ -92,6 +93,7 @@ public final class SpoonDeviceRunner {
     this.subpackageName = subpackageName;
     this.className = className;
     this.methodName = methodName;
+    this.noInstall = noInstall;
     this.testSize = testSize;
     this.classpath = classpath;
     this.instrumentationInfo = instrumentationInfo;
@@ -174,15 +176,17 @@ public final class SpoonDeviceRunner {
         result.addException(e);
       }
       // Now install the main application and the instrumentation application.
-      String installError = device.installPackage(apk.getAbsolutePath(), true);
-      if (installError != null) {
-        logInfo("[%s] app apk install failed.  Error [%s]", serial, installError);
-        return result.markInstallAsFailed("Unable to install application APK.").build();
-      }
-      installError = device.installPackage(testApk.getAbsolutePath(), true);
-      if (installError != null) {
-        logInfo("[%s] test apk install failed.  Error [%s]", serial, installError);
-        return result.markInstallAsFailed("Unable to install instrumentation APK.").build();
+      if(!noInstall){
+        String installError = device.installPackage(apk.getAbsolutePath(), true);
+        if (installError != null) {
+          logInfo("[%s] app apk install failed.  Error [%s]", serial, installError);
+          return result.markInstallAsFailed("Unable to install application APK.").build();
+        }
+        installError = device.installPackage(testApk.getAbsolutePath(), true);
+        if (installError != null) {
+          logInfo("[%s] test apk install failed.  Error [%s]", serial, installError);
+          return result.markInstallAsFailed("Unable to install instrumentation APK.").build();
+        }
       }
     } catch (InstallException e) {
       logInfo("InstallException on device [%s]", serial);
