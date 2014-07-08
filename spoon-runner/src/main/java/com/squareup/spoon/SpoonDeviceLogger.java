@@ -53,10 +53,10 @@ final class SpoonDeviceLogger implements LogCatListener {
             logs.put(current, deviceLogMessages);
           }
         } else {
-          // Only log messages from the same PID.
-          if (pid.equals(message.getPid())) {
+          //Log everything
+          //if (pid.equals(message.getPid())) {
             logs.get(current).add(message);
-          }
+          //}
 
           Matcher match = MESSAGE_END.matcher(message.getMessage());
           if (match.matches() && TEST_RUNNER.equals(message.getTag())) {
