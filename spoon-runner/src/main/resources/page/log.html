@@ -18,6 +18,10 @@
 <h1>{{title}}</h1>
 <p>{{subtitle}}</p>
 </div>
+<div>
+<textarea id="code">$( ".level-info" ).hide()</textarea>
+<a id="run" href="javascript: void(0)">Run</a>
+</div>
 <div class="row log">
 <div class="span12" style="width: 95%;">
 <table class="table">
@@ -28,7 +32,7 @@
 </thead>
 <tbody>
 {{#log}}
-<tr class="level-{{level}} {{rowClass}}">
+<tr class="level-{{level}} {{rowClass}} pid-{{pid}} tag-{{tag}}">
 <td>{{pid}}:{{tid}} | {{timestamp}} | {{level}}| {{tag}} | {{message}}</td>
 </tr>
 {{/log}}
@@ -37,5 +41,10 @@
 </div>
 </div>
 </div>
+<script>
+$("#run").click(function() {
+	eval($("#code").val());
+});
+</script>
 </body>
 </html>
