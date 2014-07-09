@@ -485,7 +485,7 @@ public final class SpoonRunner {
             HtmlRenderer prev = null;
             for (String el : parsedArgs.aggregate){
                 logInfo("Adding result file to aggregate: %s", el);
-                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out)));
+                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out));
                 if(prev == null)
                     prev = rn;
                 else {
