@@ -481,18 +481,16 @@ public final class SpoonRunner {
             return;
         }
         try {
-            List<HtmlRenderer> renders = new LinkedList<HtmlRenderer>();
+            
+            HtmlRenderer prev = null;
             for (String el : parsedArgs.aggregate){
                 logInfo("Adding result file to aggregate: %s", el);
-                renders.add(new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out)));
-            }
-
-            HtmlRenderer prev = null;
-            for (HtmlRenderer rn : renders ){
+                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out)));
                 if(prev == null)
                     prev = rn;
                 else {
                     logInfo("Aggregating: %s with %s", prev, rn);
+                    // doesn't write on parsedArgs.aggregate_out yet
                     prev = prev.aggregate(rn,new File(parsedArgs.aggregate_out));
                 }
             }
