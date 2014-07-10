@@ -20,6 +20,10 @@
 				<h1>{{title}}</h1>
 				<p>{{subtitle}}</p>
 			</div>
+			<div style="position: fixed; top: 20px; left: 20px;">
+			<textarea id="code">$( ".level-info" ).hide()</textarea>
+			<a id="run" href="javascript: void(0)">Run</a>
+			</div>
 			<div class="row log">
 				<div class="span12" style="width: 95%;">
 					<table class="table">
@@ -35,5 +39,10 @@
 				</div>
 			</div>
 		</div>
+		<script>
+		$("#run").click(function() {
+			eval($("#code").val());
+		});
+		</script>
 	</body>
 </html>
