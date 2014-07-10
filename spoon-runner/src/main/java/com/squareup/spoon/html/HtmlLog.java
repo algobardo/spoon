@@ -84,7 +84,7 @@ final class HtmlLog {
       this.rowClass = rowClass;
       this.timestamp = timestamp;
       this.level = level;
-      this.tag = tag;
+      this.tag = tag != null && !tag.trim().equals("") ? "tag-" + tag.replace("&", " tag-") : "";
       this.message = message;
       this.pid = pid;
       this.tid = tid;
