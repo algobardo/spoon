@@ -45,11 +45,13 @@ public final class HtmlRenderer {
   private final SpoonSummary summary;
   private final Gson gson;
   private final File output;
+  private boolean noresultjson;
 
   public HtmlRenderer(SpoonSummary summary, Gson gson, File output) {
     this.summary = summary;
     this.gson = gson;
     this.output = output;
+    this.noresultjson = true;
   }
 
   public HtmlRenderer(Gson gson, File input, File output) throws FileNotFoundException{
@@ -58,7 +60,18 @@ public final class HtmlRenderer {
       this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
       this.gson = gson;
       this.output = output;
+      this.noresultjson = true;
   }
+
+  public HtmlRenderer(Gson gson, File input, File output, boolean noresultjson) throws FileNotFoundException{
+
+      FileReader fr = new FileReader(input);
+      this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
+      this.gson = gson;
+      this.output = output;
+      this.noresultjson = noresultjson;
+  }
+
   public HtmlRenderer aggregate(HtmlRenderer htmlr,File newoutput){
       return new HtmlRenderer(this.summary.aggregate(htmlr.summary),gson,newoutput);
   }
@@ -68,7 +81,9 @@ public final class HtmlRenderer {
 
     copyStaticAssets();
     generateCssFromLess();
-    writeResultJson();
+    
+    if (!this.noresultjson)
+      writeResultJson();
 
     MustacheFactory mustacheFactory = new DefaultMustacheFactory();
     generateTvHtml(mustacheFactory);

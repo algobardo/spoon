@@ -425,6 +425,10 @@ public final class SpoonRunner {
     @Parameter(names = { "--noinstall" }, description =
               "Avoid installing the app", help = true)
     public boolean noinstall;
+
+    @Parameter(names = { "--noresultjson" }, description =
+              "Avoid writing result.json", help = true)
+    public boolean noresultjson;
   }
 
   private static File cleanFile(String path) {
@@ -481,11 +485,10 @@ public final class SpoonRunner {
             return;
         }
         try {
-            
             HtmlRenderer prev = null;
             for (String el : parsedArgs.aggregate){
                 logInfo("Adding result file to aggregate: %s", el);
-                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out));
+                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out), parsedArgs.noresultjson);
                 if(prev == null)
                     prev = rn;
                 else {
