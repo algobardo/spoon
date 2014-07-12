@@ -51,16 +51,15 @@ public final class HtmlRenderer {
     this.summary = summary;
     this.gson = gson;
     this.output = output;
-    this.noresultjson = true;
+    this.noresultjson = false;
   }
 
   public HtmlRenderer(Gson gson, File input, File output) throws FileNotFoundException{
-
       FileReader fr = new FileReader(input);
       this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
       this.gson = gson;
       this.output = output;
-      this.noresultjson = true;
+      this.noresultjson = false;
   }
 
   public HtmlRenderer(Gson gson, File input, File output, boolean noresultjson) throws FileNotFoundException{
