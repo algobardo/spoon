@@ -44,6 +44,7 @@ final class SpoonDeviceLogger implements LogCatListener {
     return found;
   }
 
+  //TODO: match the tags here with the ones in HtmlLog, including tag-%%%
   @Override public void log(List<LogCatMessage> msgList) {
     synchronized (messages) {
       for (Iterator<LogCatMessage> it = msgList.iterator(); it.hasNext(); ) {
