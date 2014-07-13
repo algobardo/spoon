@@ -4,9 +4,12 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.logcat.LogCatListener;
 import com.android.ddmlib.logcat.LogCatMessage;
 import com.android.ddmlib.logcat.LogCatReceiverTask;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,9 +21,11 @@ final class SpoonDeviceLogger implements LogCatListener {
 
   private final List<LogCatMessage> messages;
   private final LogCatReceiverTask logCatReceiverTask;
+  private final List<String> filterTags;
 
-  public SpoonDeviceLogger(IDevice device) {
+  public SpoonDeviceLogger(IDevice device, List<String> filterTags) {
     messages = new ArrayList<LogCatMessage>();
+    this.filterTags = filterTags;
     logCatReceiverTask = new LogCatReceiverTask(device);
     logCatReceiverTask.addLogCatListener(this);
 
@@ -28,9 +33,27 @@ final class SpoonDeviceLogger implements LogCatListener {
     new Thread(logCatReceiverTask).start();
   }
 
+  private boolean nonEmptyIntersection(List one, List two){
+    boolean found = false;
+    for (Iterator it = one.iterator(); it.hasNext(); ) {
+      if(two.contains(it.next())){
+        found = true;
+        break;
+      }
+    }
+    return found;
+  }
+
   @Override public void log(List<LogCatMessage> msgList) {
     synchronized (messages) {
-      messages.addAll(msgList);
+      for (Iterator<LogCatMessage> it = msgList.iterator(); it.hasNext(); ) {
+        LogCatMessage msg = it.next();
+        List<String> curTags = Arrays.asList(msg.getTag().split("&"));
+        // Only add if no filterTags contains no tag or the current tag is contained in filterTags
+        if(filterTags == null || nonEmptyIntersection(filterTags, curTags) || curTags.contains("TestRunner")){
+          messages.add(msg);
+        }
+      }
     }
   }
 

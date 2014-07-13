@@ -52,6 +52,7 @@ public final class SpoonDeviceRunner {
   private final boolean debug;
   private final boolean noAnimations;
   private final boolean noInstall;
+  private final List<String> filterTags;
   private final int adbTimeout;
   private final String subpackageName;
   private final String className;
@@ -82,7 +83,8 @@ public final class SpoonDeviceRunner {
   SpoonDeviceRunner(File sdk, File apk, File testApk, File output, String serial, boolean debug,
       boolean noAnimations, int adbTimeout, String classpath,
       SpoonInstrumentationInfo instrumentationInfo, String subpackageName, String className, 
-      String methodName, boolean noInstall, IRemoteAndroidTestRunner.TestSize testSize) {
+      String methodName, boolean noInstall, List<String> filterTags,
+      IRemoteAndroidTestRunner.TestSize testSize) {
     this.sdk = sdk;
     this.apk = apk;
     this.testApk = testApk;
@@ -94,6 +96,7 @@ public final class SpoonDeviceRunner {
     this.className = className;
     this.methodName = methodName;
     this.noInstall = noInstall;
+    this.filterTags = filterTags;
     this.testSize = testSize;
     this.classpath = classpath;
     this.instrumentationInfo = instrumentationInfo;
@@ -198,7 +201,7 @@ public final class SpoonDeviceRunner {
     work.mkdirs();
 
     // Initiate device logging.
-    SpoonDeviceLogger deviceLogger = new SpoonDeviceLogger(device);
+    SpoonDeviceLogger deviceLogger = new SpoonDeviceLogger(device, filterTags);
 
     // Run all the tests! o/
     try {
