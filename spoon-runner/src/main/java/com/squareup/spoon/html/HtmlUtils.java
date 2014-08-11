@@ -191,7 +191,7 @@ final class HtmlUtils {
     if (exception == null) {
       return null;
     }
-    String message = exception.toString().replace("\n", "<br/>");
+    String message = exception.toString().replace("<", "&lt").replace(">", "&gt;").replace("\n", "<br/>");
     List<String> lines = new ArrayList<String>();
     for (StackTrace.Element element : exception.getElements()) {
       lines.add("&nbsp;&nbsp;&nbsp;&nbsp;at " + element.toString());
@@ -248,7 +248,7 @@ final class HtmlUtils {
 
     ExceptionInfo(String title, List<String> body) {
       this.id = ID.getAndIncrement();
-      this.title = title.replace("<", "&lt;").replace(">", "&gt;");
+      this.title = title;
       this.body = body;
     }
   }
