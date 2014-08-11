@@ -248,7 +248,7 @@ final class HtmlUtils {
 
     ExceptionInfo(String title, List<String> body) {
       this.id = ID.getAndIncrement();
-      this.title = title;
+      this.title = title.replace("<", "&lt;").replace(">", "&gt;");
       this.body = body;
     }
   }
