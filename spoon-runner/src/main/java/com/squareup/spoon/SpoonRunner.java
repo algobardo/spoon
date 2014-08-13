@@ -46,6 +46,7 @@ public final class SpoonRunner {
   private List<String> filterTags = null;
   private final Set<String> serials;
   private final String classpath;
+  private final String runId;
   private final IRemoteAndroidTestRunner.TestSize testSize;
   private final boolean failIfNoDeviceConnected;
 
@@ -53,7 +54,7 @@ public final class SpoonRunner {
       File output, boolean debug, boolean noAnimations, int adbTimeout, Set<String> serials,
       String classpath, String subpackageName, String className, String methodName,
       IRemoteAndroidTestRunner.TestSize testSize, boolean noInstall, boolean failIfNoDeviceConnected,
-      String filterLog) {
+      String filterLog, String runId) {
     this.title = title;
     this.androidSdk = androidSdk;
     this.applicationApk = applicationApk;
@@ -68,6 +69,7 @@ public final class SpoonRunner {
     this.classpath = classpath;
     this.testSize = testSize;
     this.noInstall = noInstall;
+    this.runId = runId;
     this.serials = ImmutableSet.copyOf(serials);
     this.failIfNoDeviceConnected = failIfNoDeviceConnected;
 
@@ -208,7 +210,7 @@ public final class SpoonRunner {
   private SpoonDeviceRunner getTestRunner(String serial, SpoonInstrumentationInfo testInfo) {
     return new SpoonDeviceRunner(androidSdk, applicationApk, instrumentationApk, output, serial,
         debug, noAnimations, adbTimeout, classpath, testInfo, subpackageName, className, methodName, noInstall, 
-        filterTags, testSize);
+        filterTags, testSize, runId);
   }
 
   /** Build a test suite for the specified devices and configuration. */
@@ -224,6 +226,7 @@ public final class SpoonRunner {
     private String subpackageName;
     private String className;
     private String methodName;
+    private String runId;
     private boolean noAnimations;
     private boolean noInstall;
     private String filterLog;
@@ -281,6 +284,11 @@ public final class SpoonRunner {
       return this;
     }
 
+    /** Set the id of this spoon run. */
+    public Builder setRunId(String runId) {
+      this.runId = runId;
+      return this;
+    }
 
     /** Whether or not animations are enabled. */
     public Builder setNoAnimations(boolean noAnimations) {
@@ -368,7 +376,7 @@ public final class SpoonRunner {
 
       return new SpoonRunner(title, androidSdk, applicationApk, instrumentationApk, output, debug,
           noAnimations, adbTimeout, serials, classpath, subpackageName, className, methodName, testSize,
-          noInstall, failIfNoDeviceConnected, filterLog);
+          noInstall, failIfNoDeviceConnected, filterLog, runId);
     }
   }
 
@@ -448,6 +456,10 @@ public final class SpoonRunner {
     @Parameter(names = { "--filterLog" }, description =
               "\"&\" separated list of log tag to keep ", help = true)
     public String filterLog;
+    
+    @Parameter(names = { "--runId" }, description =
+            "\"&\" identifier of the run, shared by all the test cases in this spoon run ", help = true)
+    public String runId;
 
   }
 
@@ -497,10 +509,10 @@ public final class SpoonRunner {
     HtmlRenderer.setPrettify(!parsedArgs.nopretty);
 
     if ((parsedArgs.aggregate != null &&  !parsedArgs.aggregate.isEmpty()) || 
-      (parsedArgs.aggregate_out != null && parsedArgs.aggregate_out != "")){
+      (parsedArgs.aggregate_out != null && !parsedArgs.aggregate_out.isEmpty())){
         //Entering aggregation mode
         if (parsedArgs.aggregate == null || parsedArgs.aggregate.isEmpty() ||
-         parsedArgs.aggregate_out == null || parsedArgs.aggregate_out == "") {
+         parsedArgs.aggregate_out == null || parsedArgs.aggregate_out.isEmpty()) {
             System.err.println("Parameters missing for aggregation");
             return;
         }
@@ -541,6 +553,7 @@ public final class SpoonRunner {
         .setClassName(parsedArgs.className)
         .setMethodName(parsedArgs.methodName)
         .setNoInstall(parsedArgs.noinstall)
+        .setRunId((parsedArgs.runId != null && !parsedArgs.equals("") ? parsedArgs.runId : "defaultid" ))
         .setFilterLog(parsedArgs.filterLog)
         .useAllAttachedDevices()
         .build();

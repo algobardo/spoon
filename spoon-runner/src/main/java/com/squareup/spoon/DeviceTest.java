@@ -1,5 +1,9 @@
 package com.squareup.spoon;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.android.ddmlib.testrunner.TestIdentifier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -12,7 +16,7 @@ public final class DeviceTest implements Comparable<DeviceTest> {
 
   private final String className;
   private final String methodName;
-
+  
   DeviceTest(String className, String methodName) {
     checkNotNull(className);
     checkNotNull(methodName);
@@ -29,6 +33,7 @@ public final class DeviceTest implements Comparable<DeviceTest> {
   public String getMethodName() {
     return methodName;
   }
+  
 
   @Override public boolean equals(Object o) {
     if (this == o) return true;
@@ -57,4 +62,6 @@ public final class DeviceTest implements Comparable<DeviceTest> {
     }
     return methodName.compareTo(other.methodName);
   }
+  
+  
 }

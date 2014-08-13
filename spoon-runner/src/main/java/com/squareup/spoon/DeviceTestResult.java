@@ -20,21 +20,23 @@ public final class DeviceTestResult {
     PASS, FAIL, ERROR
   }
 
-  private final Status status;
-  private final StackTrace exception;
-  private final long duration;
-  private final List<File> screenshots;
-  private final File animatedGif;
-  private final List<LogCatMessage> log;
+  private Status status;
+  private StackTrace exception;
+  private long duration;
+  private List<File> screenshots;
+  private File animatedGif;
+  private List<LogCatMessage> log;
+  private List runIds;
 
   private DeviceTestResult(Status status, StackTrace exception, long duration,
-      List<File> screenshots, File animatedGif, List<LogCatMessage> log) {
+      List<File> screenshots, File animatedGif, List<LogCatMessage> log, List<String> runIds) {
     this.status = status;
     this.exception = exception;
     this.duration = duration;
     this.screenshots = unmodifiableList(new ArrayList<File>(screenshots));
     this.animatedGif = animatedGif;
-    this.log = unmodifiableList(new ArrayList<LogCatMessage>(log));
+    this.log = new ArrayList<LogCatMessage>(log);
+    this.runIds = new ArrayList<String>(runIds);
   }
 
   /** Execution status. */
@@ -65,6 +67,19 @@ public final class DeviceTestResult {
   public List<LogCatMessage> getLog() {
     return log;
   }
+  
+  public void merge(DeviceTestResult other) {
+  	if(this.exception == null) 
+  		this.exception = other.exception;
+  	this.duration += other.duration;
+  	this.log.addAll(other.log);
+  	if(this.status == Status.FAIL || other.status == Status.FAIL)
+  		this.status = Status.FAIL;
+  	else if(this.status == Status.ERROR || other.status == Status.ERROR)
+  		this.status = Status.ERROR;
+  	this.screenshots.addAll(other.screenshots);
+  	this.runIds.addAll(other.runIds);
+  }
 
   public static class Builder {
     private final List<File> screenshots = new ArrayList<File>();
@@ -74,6 +89,7 @@ public final class DeviceTestResult {
     private long duration = -1;
     private File animatedGif;
     private List<LogCatMessage> log;
+    private List<String> runIds;
 
     public Builder markTestAsFailed(String message) {
       checkNotNull(message);
@@ -96,6 +112,13 @@ public final class DeviceTestResult {
       checkArgument(this.log == null, "Log already added.");
       this.log = log;
       return this;
+    }
+    
+    public Builder setRunIds(List<String> runIds) {
+        checkNotNull(runIds);
+        checkArgument(this.runIds == null, "Run IDs already added.");
+        this.runIds = runIds;
+        return this;
     }
 
     public Builder startTest() {
@@ -128,7 +151,14 @@ public final class DeviceTestResult {
       if (log == null) {
         log = Collections.emptyList();
       }
-      return new DeviceTestResult(status, exception, duration, screenshots, animatedGif, log);
+      if(runIds == null) {
+    	  runIds = new ArrayList();
+    	  runIds.add("testId");
+      }
+      
+      return new DeviceTestResult(status, exception, duration, screenshots, animatedGif, log, runIds);
     }
+    
+    
   }
 }

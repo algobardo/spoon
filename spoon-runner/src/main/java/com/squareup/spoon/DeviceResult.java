@@ -4,9 +4,11 @@ import com.squareup.spoon.misc.StackTrace;
 import com.sun.org.apache.xalan.internal.lib.ExsltSets;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Sets;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
@@ -87,20 +89,28 @@ public final class DeviceResult {
         //this.installMessage = installMessage &&
         //this.deviceDetails = deviceDetails;
       //this.started = started;
-
-      Sets.SetView<DeviceTest> commontest = Sets.intersection(dres.testResults.keySet(),testResults.keySet());
-      if(!commontest.isEmpty()){
-        logInfo("The two results are incomparable, when comparing " + this + 
-          " with tests " + this.testResults.keySet() + 
-          " againsts "+ dres + "with tests " + dres.testResults.keySet() 
-          +": they share at least one method: " + commontest);
-      }
-
       long newDuration = this.duration + dres.duration;
 
+      Sets.SetView<DeviceTest> commontest = Sets.intersection(testResults.keySet(), dres.testResults.keySet());
+      
       Map<DeviceTest, DeviceTestResult> newResults = new TreeMap<DeviceTest, DeviceTestResult>();
+     
+      
+      Iterator<DeviceTest> it = dres.testResults.keySet().iterator();
+      while(it.hasNext()) {
+    	  DeviceTest dt = it.next();
+    	  if(!commontest.contains(dt))
+    		  newResults.put(dt, dres.testResults.get(dt));
+      }
+      
+      it = commontest.iterator();
+      while(it.hasNext()) {
+    	  DeviceTest dt = it.next();
+    	  this.testResults.get(dt).merge(dres.testResults.get(dt));
+      }
+      
       newResults.putAll(this.testResults);
-      newResults.putAll(dres.testResults);
+     
       newResults = unmodifiableMap(newResults);
 
       ArrayList<StackTrace> newExceptions = new ArrayList<StackTrace>();

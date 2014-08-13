@@ -57,6 +57,7 @@ public final class SpoonDeviceRunner {
   private final String subpackageName;
   private final String className;
   private final String methodName;
+  private final String runId;
   private final IRemoteAndroidTestRunner.TestSize testSize;
   private final File work;
   private final File junitReport;
@@ -84,7 +85,7 @@ public final class SpoonDeviceRunner {
       boolean noAnimations, int adbTimeout, String classpath,
       SpoonInstrumentationInfo instrumentationInfo, String subpackageName, String className, 
       String methodName, boolean noInstall, List<String> filterTags,
-      IRemoteAndroidTestRunner.TestSize testSize) {
+      IRemoteAndroidTestRunner.TestSize testSize, String runId) {
     this.sdk = sdk;
     this.apk = apk;
     this.testApk = testApk;
@@ -98,6 +99,7 @@ public final class SpoonDeviceRunner {
     this.noInstall = noInstall;
     this.filterTags = filterTags;
     this.testSize = testSize;
+    this.runId = runId;
     this.classpath = classpath;
     this.instrumentationInfo = instrumentationInfo;
 
@@ -236,7 +238,19 @@ public final class SpoonDeviceRunner {
         builder.setLog(entry.getValue());
       }
     }
+    
+    // Add the id to each test
+    for (Map.Entry<DeviceTest, List<LogCatMessage>> entry : logs.entrySet()) {
+       DeviceTestResult.Builder builder = result.getMethodResultBuilder(entry.getKey());
+       if (builder != null) {
+          ArrayList<String> ids = new ArrayList<String>();
+          ids.add(runId);
+          builder.setRunIds(ids);
+       }
+     } 
 
+    
+    
     try {
       logDebug(debug, "About to grab screenshots and prepare output for [%s]", serial);
 
