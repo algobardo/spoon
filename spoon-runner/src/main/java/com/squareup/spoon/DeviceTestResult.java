@@ -2,12 +2,15 @@ package com.squareup.spoon;
 
 import com.android.ddmlib.logcat.LogCatMessage;
 import com.squareup.spoon.misc.StackTrace;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.squareup.spoon.SpoonLogger.logInfo;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
@@ -20,32 +23,42 @@ public final class DeviceTestResult {
     PASS, FAIL, ERROR
   }
 
-  private Status status;
-  private StackTrace exception;
+  private List<Status> status;
+  private List<StackTrace> exception;
   private long duration;
   private List<File> screenshots;
   private File animatedGif;
   private List<LogCatMessage> log;
-  private List runIds;
+  private List<String> runIds;
 
-  private DeviceTestResult(Status status, StackTrace exception, long duration,
+  private DeviceTestResult(List<Status> status, List<StackTrace> exception, long duration,
       List<File> screenshots, File animatedGif, List<LogCatMessage> log, List<String> runIds) {
     this.status = status;
     this.exception = exception;
     this.duration = duration;
     this.screenshots = unmodifiableList(new ArrayList<File>(screenshots));
     this.animatedGif = animatedGif;
-    this.log = new ArrayList<LogCatMessage>(log);
-    this.runIds = new ArrayList<String>(runIds);
+    this.log = log;
+    this.runIds = runIds;
   }
 
   /** Execution status. */
-  public Status getStatus() {
-    return status;
+  public Status getOverallStatus() {
+    if(status.contains(Status.FAIL))
+    	return Status.FAIL;
+    else if (status.contains(Status.ERROR))
+    	return Status.ERROR;
+    else
+    	return status.get(0);
+  }
+  
+  /** Execution status. */
+  public List<Status> getStatus() {
+	  return status;
   }
 
   /** Exception thrown during execution. */
-  public StackTrace getException() {
+  public List<StackTrace> getException() {
     return exception;
   }
 
@@ -68,42 +81,61 @@ public final class DeviceTestResult {
     return log;
   }
   
+  public List<String> getRunIds() {
+	  return runIds;
+  }
+  
   public void merge(DeviceTestResult other) {
-  	if(this.exception == null) 
-  		this.exception = other.exception;
+  	this.exception.addAll(other.exception);
   	this.duration += other.duration;
+  	LogCatMessage last = this.log.get(this.log.size()-1);
+  	String lastId = this.runIds.get(this.runIds.size()-1);
+  	try {
+  	java.lang.reflect.Field m = LogCatMessage.class.getDeclaredField("mMessage");
+  	m.setAccessible(true);
+  	m.set(last, last.getMessage() + " --- end of id " + lastId);
+  	}
+  	catch(Throwable e) {
+  		
+  	}
+  	
   	this.log.addAll(other.log);
-  	if(this.status == Status.FAIL || other.status == Status.FAIL)
-  		this.status = Status.FAIL;
-  	else if(this.status == Status.ERROR || other.status == Status.ERROR)
-  		this.status = Status.ERROR;
+  	this.status.addAll(other.status);
   	this.screenshots.addAll(other.screenshots);
   	this.runIds.addAll(other.runIds);
   }
 
   public static class Builder {
     private final List<File> screenshots = new ArrayList<File>();
-    private Status status = Status.PASS;
-    private StackTrace exception;
+    private List<Status> status = new ArrayList<Status>(Arrays.asList(Status.PASS));
+    private List<StackTrace> exception = new ArrayList<StackTrace>();
     private long start;
     private long duration = -1;
     private File animatedGif;
     private List<LogCatMessage> log;
-    private List<String> runIds;
+    private List<String> runIds = new ArrayList<String>(Arrays.asList("test-id"));
+    
+    
 
     public Builder markTestAsFailed(String message) {
+      logInfo("->markTestAsFailed" +  "Current status: " + status.get(0) + "Exceptions:" + exception + "Run ids:" + runIds);
       checkNotNull(message);
-      checkArgument(status == Status.PASS, "Status was already marked as " + status);
-      status = Status.FAIL;
-      exception = StackTrace.from(message);
+      checkArgument(status.get(0) == Status.PASS, "Status was already marked as " + status);
+      status.set(0, Status.FAIL);
+      exception = new ArrayList<StackTrace>();
+      exception.add(StackTrace.from(message));
+      logInfo("<-markTestAsFailed" +  "Current status: " + status.get(0) + "Exceptions:" + exception + "Run ids:" + runIds);
       return this;
     }
 
     public Builder markTestAsError(String message) {
+      logInfo("->markTestAsError" +  "Current status: " + status.get(0) + "Exceptions:" + exception + "Run ids:" + runIds);
       checkNotNull(message);
-      checkArgument(status == Status.PASS, "Status was already marked as " + status);
-      status = Status.ERROR;
-      exception = StackTrace.from(message);
+      checkArgument(status.get(0) == Status.PASS, "Status was already marked as " + status);
+      status.set(0, Status.ERROR);
+      exception = new ArrayList<StackTrace>();
+      exception.add(StackTrace.from(message));
+      logInfo("<-markTestAsError" +  "Current status: " + status.get(0) + "Exceptions:" + exception + "Run ids:" + runIds);
       return this;
     }
 
@@ -116,7 +148,6 @@ public final class DeviceTestResult {
     
     public Builder setRunIds(List<String> runIds) {
         checkNotNull(runIds);
-        checkArgument(this.runIds == null, "Run IDs already added.");
         this.runIds = runIds;
         return this;
     }
@@ -151,10 +182,9 @@ public final class DeviceTestResult {
       if (log == null) {
         log = Collections.emptyList();
       }
-      if(runIds == null) {
-    	  runIds = new ArrayList();
-    	  runIds.add("testId");
-      }
+      
+      if(exception.isEmpty())
+    	  exception.add(null);
       
       return new DeviceTestResult(status, exception, duration, screenshots, animatedGif, log, runIds);
     }

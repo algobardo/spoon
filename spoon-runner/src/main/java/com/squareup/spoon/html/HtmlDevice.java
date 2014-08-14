@@ -20,7 +20,7 @@ final class HtmlDevice {
     for (Map.Entry<DeviceTest, DeviceTestResult> entry : result.getTestResults().entrySet()) {
       DeviceTestResult testResult = entry.getValue();
       testResults.add(TestResult.from(serial, entry.getKey(), testResult, output));
-      if (testResult.getStatus() == Status.PASS) {
+      if (testResult.getOverallStatus() == Status.PASS) {
         testsPassed += 1;
       }
     }
@@ -33,7 +33,7 @@ final class HtmlDevice {
 
     List<HtmlUtils.ExceptionInfo> exceptions = new ArrayList<HtmlUtils.ExceptionInfo>();
     for (StackTrace exception : result.getExceptions()) {
-      exceptions.add(HtmlUtils.processStackTrace(exception));
+      exceptions.add(HtmlUtils.processStackTraceSingle(exception));
     }
 
     StringBuilder subtitle1 = new StringBuilder();
@@ -86,9 +86,11 @@ final class HtmlDevice {
         screenshots.add(HtmlUtils.getScreenshot(screenshot, output));
       }
       String animatedGif = HtmlUtils.createRelativeUri(result.getAnimatedGif(), output);
-      HtmlUtils.ExceptionInfo exception = HtmlUtils.processStackTrace(result.getException());
+      List<HtmlUtils.ExceptionInfo> exception = HtmlUtils.processStackTrace(result.getException());
+      List<String> runIds = result.getRunIds();
+      
       return new TestResult(serial, className, methodName, classSimpleName, prettyMethodName,
-          testId, status, screenshots, animatedGif, exception);
+          testId, status, screenshots, animatedGif, exception, runIds);
     }
 
     public final String serial;
@@ -101,12 +103,14 @@ final class HtmlDevice {
     public final boolean hasScreenshots;
     public final List<HtmlUtils.Screenshot> screenshots;
     public final String animatedGif;
-    public final HtmlUtils.ExceptionInfo exception;
+    public final List<HtmlUtils.ExceptionInfo> exception;
+    public final List<String> runIds;
 
     TestResult(String serial, String className, String methodName, String classSimpleName,
         String prettyMethodName, String testId, String status,
         List<HtmlUtils.Screenshot> screenshots, String animatedGif,
-        HtmlUtils.ExceptionInfo exception) {
+        List<HtmlUtils.ExceptionInfo> exception,
+        List<String> runIds) {
       this.serial = serial;
       this.className = className;
       this.methodName = methodName;
@@ -118,6 +122,7 @@ final class HtmlDevice {
       this.screenshots = screenshots;
       this.animatedGif = animatedGif;
       this.exception = exception;
+      this.runIds = runIds;
     }
 
     @Override public int compareTo(TestResult other) {

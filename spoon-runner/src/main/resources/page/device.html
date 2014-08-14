@@ -53,6 +53,11 @@
                         </a>
                         {{/animatedGif}}
                     </h2>
+                    {{#runIds}}
+                    <div class="stacktrace">
+                        runid!
+                    </div>
+                    {{/runIds}}
                     {{#exception}}
                     <div class="alert alert-error stacktrace {{status}}">
                         <h4 data-toggle="collapse" data-target="#stacktrace-{{id}}">{{{title}}}</h4>

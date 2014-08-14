@@ -28,7 +28,7 @@ final class HtmlIndex {
       testsRun += testResults.size();
       for (Map.Entry<DeviceTest, DeviceTestResult> entry : testResults.entrySet()) {
         tests.add(entry.getKey());
-        if (entry.getValue().getStatus() == Status.PASS) {
+        if (entry.getValue().getOverallStatus() == Status.PASS) {
           totalSuccess += 1;
         }
       }

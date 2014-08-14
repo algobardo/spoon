@@ -2,15 +2,19 @@ package com.squareup.spoon.html;
 
 import com.squareup.spoon.DeviceDetails;
 import com.squareup.spoon.DeviceTestResult;
+import com.squareup.spoon.DeviceTestResult.Status;
 import com.squareup.spoon.misc.StackTrace;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.commons.io.FilenameUtils;
 
 import static com.squareup.spoon.DeviceTestResult.SCREENSHOT_SEPARATOR;
@@ -78,10 +82,33 @@ final class HtmlUtils {
     return className;
   }
 
+  
+  static List<String> getStatusesCssClass(List<Status> testResult) {
+    ArrayList<String> res = new ArrayList<String>();
+  	Iterator<Status> it = testResult.iterator();
+    while(it.hasNext()) {
+    	Status st = it.next();
+        switch (st) {
+        case PASS:
+          res.add("pass");
+          break;
+        case FAIL:
+          res.add("fail");
+          break;
+        case ERROR:
+          res.add("error");
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown result status: " + st);
+      }
+    }
+    return res;
+  }
+  
   /** Convert a test result status into an HTML CSS class. */
   static String getStatusCssClass(DeviceTestResult testResult) {
     String status;
-    switch (testResult.getStatus()) {
+    switch (testResult.getOverallStatus()) {
       case PASS:
         status = "pass";
         break;
@@ -186,8 +213,19 @@ final class HtmlUtils {
     return new Screenshot(relativePath, caption);
   }
 
+  static List<ExceptionInfo> processStackTrace(List<StackTrace> exceptions) {
+	  ArrayList<ExceptionInfo> eres = new ArrayList<ExceptionInfo>();
+	  Iterator<StackTrace> it = exceptions.iterator();
+	  while(it.hasNext()) {
+		  StackTrace curr = it.next();
+		  ExceptionInfo curRes = processStackTraceSingle(curr);
+		  eres.add(curRes);
+	  }
+	  return eres;
+  }
+  
   /** Parse the string representation of an exception to a {@link ExceptionInfo} instance. */
-  static ExceptionInfo processStackTrace(StackTrace exception) {
+  static ExceptionInfo processStackTraceSingle(StackTrace exception) {
     if (exception == null) {
       return null;
     }

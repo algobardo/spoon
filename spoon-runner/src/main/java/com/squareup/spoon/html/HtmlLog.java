@@ -10,7 +10,7 @@ import java.util.List;
 final class HtmlLog {
   public static HtmlLog from(String name, DeviceTest test, DeviceTestResult result) {
     String status;
-    switch (result.getStatus()) {
+    switch (result.getOverallStatus()) {
       case PASS:
         status = "passed";
         break;

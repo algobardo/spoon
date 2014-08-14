@@ -24,7 +24,7 @@ final class HtmlTest {
       DeviceTestResult testResult = deviceResult.getTestResults().get(test);
       if (testResult != null) {
         deviceCount += 1;
-        if (testResult.getStatus() == Status.PASS) {
+        if (testResult.getOverallStatus() == Status.PASS) {
           testsPassed += 1;
           duration += testResult.getDuration();
         }
@@ -82,21 +82,25 @@ final class HtmlTest {
         screenshots.add(HtmlUtils.getScreenshot(screenshot, output));
       }
       String animatedGif = HtmlUtils.createRelativeUri(result.getAnimatedGif(), output);
-      HtmlUtils.ExceptionInfo exception = HtmlUtils.processStackTrace(result.getException());
+      List<HtmlUtils.ExceptionInfo> exception = HtmlUtils.processStackTrace(result.getException());
 
-      return new TestResult(name, serial, status, screenshots, animatedGif, exception);
+      List<String> detailedStatus = HtmlUtils.getStatusesCssClass(result.getStatus());
+      
+      return new TestResult(name, serial, status, screenshots, animatedGif, exception, result.getRunIds(),  detailedStatus);
     }
 
     public final String name;
     public final String serial;
+    public final List<String> detailedStatus;
     public final String status;
     public final boolean hasScreenshots;
     public final List<HtmlUtils.Screenshot> screenshots;
     public final String animatedGif;
-    public final HtmlUtils.ExceptionInfo exception;
+    public final List<HtmlUtils.ExceptionInfo> exception;
+    public final List<String> runIds;
 
     TestResult(String name, String serial, String status, List<HtmlUtils.Screenshot> screenshots,
-        String animatedGif, HtmlUtils.ExceptionInfo exception) {
+        String animatedGif, List<HtmlUtils.ExceptionInfo> exception, List<String> runIds, List<String> detailedStatus) {
       this.name = name;
       this.serial = serial;
       this.status = status;
@@ -104,6 +108,8 @@ final class HtmlTest {
       this.screenshots = screenshots;
       this.animatedGif = animatedGif;
       this.exception = exception;
+      this.runIds = runIds;
+      this.detailedStatus = detailedStatus;
     }
 
     @Override public int compareTo(TestResult other) {
