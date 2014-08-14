@@ -88,9 +88,21 @@ final class HtmlDevice {
       String animatedGif = HtmlUtils.createRelativeUri(result.getAnimatedGif(), output);
       List<HtmlUtils.ExceptionInfo> exception = HtmlUtils.processStackTrace(result.getException());
       List<String> runIds = result.getRunIds();
+      List<String> detailedStatus = HtmlUtils.getStatusesCssClass(result.getStatus());
       
+      List<IdsTriples> triples = new ArrayList<IdsTriples>();
+      
+      for(int i = 0; i < detailedStatus.size(); i++) {
+        IdsTriples triple = new IdsTriples();
+        triple.status = detailedStatus.get(i);
+        triple.exception = exception.get(i);
+        triple.runId = runIds.get(i);
+        triples.add(triple);
+      }
+
+
       return new TestResult(serial, className, methodName, classSimpleName, prettyMethodName,
-          testId, status, screenshots, animatedGif, exception, runIds);
+          testId, status, screenshots, animatedGif, triples);
     }
 
     public final String serial;
@@ -103,14 +115,12 @@ final class HtmlDevice {
     public final boolean hasScreenshots;
     public final List<HtmlUtils.Screenshot> screenshots;
     public final String animatedGif;
-    public final List<HtmlUtils.ExceptionInfo> exception;
-    public final List<String> runIds;
+    List<IdsTriples> triples;
 
     TestResult(String serial, String className, String methodName, String classSimpleName,
         String prettyMethodName, String testId, String status,
         List<HtmlUtils.Screenshot> screenshots, String animatedGif,
-        List<HtmlUtils.ExceptionInfo> exception,
-        List<String> runIds) {
+        List<IdsTriples> triples) {
       this.serial = serial;
       this.className = className;
       this.methodName = methodName;
@@ -121,8 +131,7 @@ final class HtmlDevice {
       this.hasScreenshots = !screenshots.isEmpty();
       this.screenshots = screenshots;
       this.animatedGif = animatedGif;
-      this.exception = exception;
-      this.runIds = runIds;
+      this.triples = triples;
     }
 
     @Override public int compareTo(TestResult other) {
@@ -132,5 +141,16 @@ final class HtmlDevice {
       }
       return methodName.compareTo(other.methodName);
     }
+  }
+
+
+  static final class IdsTriples  implements Comparable<IdsTriples> {
+    public String runId;
+    public HtmlUtils.ExceptionInfo exception;
+    public String status;
+    
+    @Override public int compareTo(IdsTriples other) {
+        return runId.compareTo(other.runId);
+      }
   }
 }

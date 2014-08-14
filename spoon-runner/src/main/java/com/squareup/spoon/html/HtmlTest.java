@@ -5,6 +5,8 @@ import com.squareup.spoon.DeviceResult;
 import com.squareup.spoon.DeviceTest;
 import com.squareup.spoon.DeviceTestResult;
 import com.squareup.spoon.SpoonSummary;
+import com.squareup.spoon.misc.StackTrace;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,34 +88,50 @@ final class HtmlTest {
 
       List<String> detailedStatus = HtmlUtils.getStatusesCssClass(result.getStatus());
       
-      return new TestResult(name, serial, status, screenshots, animatedGif, exception, result.getRunIds(),  detailedStatus);
+      List<IdsTriples> triples = new ArrayList<IdsTriples>();
+      
+      for(int i = 0; i < detailedStatus.size(); i++) {
+    	  IdsTriples triple = new IdsTriples();
+    	  triple.status = detailedStatus.get(i);
+    	  triple.exception = exception.get(i);
+    	  triple.runId = result.getRunIds().get(i);
+    	  triples.add(triple);
+      }
+      
+      return new TestResult(name, serial, status, screenshots, animatedGif, triples);
     }
 
     public final String name;
     public final String serial;
-    public final List<String> detailedStatus;
     public final String status;
     public final boolean hasScreenshots;
     public final List<HtmlUtils.Screenshot> screenshots;
     public final String animatedGif;
-    public final List<HtmlUtils.ExceptionInfo> exception;
-    public final List<String> runIds;
+    public final List<IdsTriples> triples;
 
     TestResult(String name, String serial, String status, List<HtmlUtils.Screenshot> screenshots,
-        String animatedGif, List<HtmlUtils.ExceptionInfo> exception, List<String> runIds, List<String> detailedStatus) {
+        String animatedGif, List<IdsTriples> triples) {
       this.name = name;
       this.serial = serial;
       this.status = status;
       this.hasScreenshots = !screenshots.isEmpty();
       this.screenshots = screenshots;
       this.animatedGif = animatedGif;
-      this.exception = exception;
-      this.runIds = runIds;
-      this.detailedStatus = detailedStatus;
+      this.triples = triples;
     }
 
     @Override public int compareTo(TestResult other) {
       return name.compareTo(other.name);
     }
+  }
+  
+  static final class IdsTriples  implements Comparable<IdsTriples> {
+	  public String runId;
+	  public HtmlUtils.ExceptionInfo exception;
+	  public String status;
+	  
+	  @Override public int compareTo(IdsTriples other) {
+	      return runId.compareTo(other.runId);
+	    }
   }
 }

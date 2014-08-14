@@ -53,21 +53,19 @@
                         </a>
                         {{/animatedGif}}
                     </h2>
-                    {{#runIds}}
-                    <div class="stacktrace">
-                        {{{toString}}}
-                    </div>
-                    {{/runIds}}
-                    {{#exception}}
-                    <div class="alert alert-error stacktrace {{status}}">
+                    {{#triples}}
+                    	{{runId}}
+                    	{{#exception}}
+                    	<div class="alert alert-error stacktrace {{status}}">
                         <h4 data-toggle="collapse" data-target="#stacktrace-{{id}}">{{{title}}}</h4>
-                        <div class="stacktrace-body collapse" id="stacktrace-{{id}}">
-                            {{#body}}
-                            <div class="stacktrace-line">{{{toString}}}</div>
-                            {{/body}}
-                        </div>
-                    </div>
-                    {{/exception}}
+	                        <div class="stacktrace-body collapse" id="stacktrace-{{id}}">
+	                            {{#body}}
+	                            <div class="stacktrace-line">{{{toString}}}</div>
+	                            {{/body}}
+	                        </div>
+                    	</div>
+                    	{{/exception}}
+                    {{/triples}}
                     {{#hasScreenshots}}
                     <ul class="thumbnails">
                         {{#screenshots}}
