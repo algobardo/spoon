@@ -37,59 +37,58 @@ public final class HtmlRenderer {
   public static void setPrettify(boolean prettify) {
       HtmlRenderer.prettify = prettify;
   }
+
   public static boolean getPrettify() {
         return HtmlRenderer.prettify;
   }
-
 
   private final SpoonSummary summary;
   private final Gson gson;
   private final File output;
   private boolean noresultjson;
+  private boolean nohtml;
 
-  public HtmlRenderer(SpoonSummary summary, Gson gson, File output) {
+  public HtmlRenderer(SpoonSummary summary, Gson gson, File output, boolean noresultjson, boolean nohtml) {
     this.summary = summary;
     this.gson = gson;
     this.output = output;
-    this.noresultjson = false;
+    this.noresultjson = noresultjson;
+    this.nohtml = nohtml;
   }
 
-  public HtmlRenderer(Gson gson, File input, File output) throws FileNotFoundException{
-      FileReader fr = new FileReader(input);
-      this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
-      this.gson = gson;
-      this.output = output;
-      this.noresultjson = false;
-  }
-
-  public HtmlRenderer(Gson gson, File input, File output, boolean noresultjson) throws FileNotFoundException{
-
+  public HtmlRenderer(Gson gson, File input, File output, boolean noresultjson, boolean nohtml) throws FileNotFoundException {
       FileReader fr = new FileReader(input);
       this.summary = (SpoonSummary) gson.fromJson(fr, SpoonSummary.class);
       this.gson = gson;
       this.output = output;
       this.noresultjson = noresultjson;
+      this.nohtml = nohtml;
   }
 
-  public HtmlRenderer aggregate(HtmlRenderer htmlr,File newoutput){
-      return new HtmlRenderer(this.summary.aggregate(htmlr.summary),gson,newoutput);
+  public HtmlRenderer aggregate(HtmlRenderer htmlr, File newoutput, boolean noresultjson, boolean nohtml){
+      return new HtmlRenderer(this.summary.aggregate(htmlr.summary), gson, newoutput, noresultjson, nohtml);
   }
 
   public void render() {
     output.mkdirs();
 
-    copyStaticAssets();
-    generateCssFromLess();
+    if (!nohtml) {
+      copyStaticAssets();
+      generateCssFromLess();
+    }
     
-    if (!this.noresultjson)
+    if (!noresultjson) {
       writeResultJson();
+    }
 
-    MustacheFactory mustacheFactory = new DefaultMustacheFactory();
-    generateTvHtml(mustacheFactory);
-    generateIndexHtml(mustacheFactory);
-    generateDeviceHtml(mustacheFactory);
-    generateTestHtml(mustacheFactory);
-    generateLogHtml(mustacheFactory);
+    if (!nohtml) {
+      MustacheFactory mustacheFactory = new DefaultMustacheFactory();
+      generateTvHtml(mustacheFactory);
+      generateIndexHtml(mustacheFactory);
+      generateDeviceHtml(mustacheFactory);
+      generateTestHtml(mustacheFactory);
+      generateLogHtml(mustacheFactory);
+    }
   }
 
   private void copyStaticAssets() {

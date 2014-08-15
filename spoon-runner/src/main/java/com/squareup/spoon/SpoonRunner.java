@@ -85,7 +85,7 @@ public final class SpoonRunner {
    *
    * @return {@code true} if there were no test failures or exceptions thrown.
    */
-  public boolean run() {
+  public boolean run(CommandLineArgs parsedArgs) {
     checkArgument(applicationApk.exists(), "Could not find application APK.");
     checkArgument(instrumentationApk.exists(), "Could not find instrumentation APK.");
 
@@ -104,7 +104,7 @@ public final class SpoonRunner {
       // Execute all the things...
       SpoonSummary summary = runTests(adb, serials);
       // ...and render to HTML
-      new HtmlRenderer(summary, SpoonUtils.GSON, output).render();
+      new HtmlRenderer(summary, SpoonUtils.GSON, output, parsedArgs.noresultjson, parsedArgs.nohtml).render();
 
       return parseOverallSuccess(summary);
     } finally {
@@ -453,6 +453,10 @@ public final class SpoonRunner {
               "Avoid writing result.json", help = true)
     public boolean noresultjson;
 
+    @Parameter(names = { "--nohtml" }, description =
+              "Avoid writing html pages and resources", help = true)
+    public boolean nohtml;
+
     @Parameter(names = { "--filterLog" }, description =
               "\"&\" separated list of log tag to keep ", help = true)
     public String filterLog;
@@ -520,13 +524,13 @@ public final class SpoonRunner {
             HtmlRenderer prev = null;
             for (String el : parsedArgs.aggregate){
                 logInfo("Adding result file to aggregate: %s", el);
-                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out), parsedArgs.noresultjson);
+                HtmlRenderer rn = new HtmlRenderer(SpoonUtils.GSON, new File(el), new File(parsedArgs.aggregate_out), parsedArgs.noresultjson, parsedArgs.nohtml);
                 if(prev == null)
                     prev = rn;
                 else {
                     logInfo("Aggregating: %s with %s", prev, rn);
                     // doesn't write on parsedArgs.aggregate_out yet
-                    prev = prev.aggregate(rn,new File(parsedArgs.aggregate_out));
+                    prev = prev.aggregate(rn, new File(parsedArgs.aggregate_out), parsedArgs.noresultjson, parsedArgs.nohtml);
                 }
             }
 
@@ -558,7 +562,7 @@ public final class SpoonRunner {
         .useAllAttachedDevices()
         .build();
 
-    if (!spoonRunner.run() && parsedArgs.failOnFailure) {
+    if (!spoonRunner.run(parsedArgs) && parsedArgs.failOnFailure) {
       System.exit(1);
     }
   }
