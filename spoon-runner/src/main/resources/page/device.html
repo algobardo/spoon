@@ -54,10 +54,9 @@
                         {{/animatedGif}}
                     </h2>
                     {{#triples}}
-                    	<div>
-                            <h4 class="test-result {{status}}">
-                            {{runId}} : {{status}}
-                            </h4>
+                        <h4 class="test-result {{status}}">
+                        {{runId}} : {{status}}
+                        </h4>
                     	{{#exception}}
                     	<div class="alert alert-error stacktrace {{status}}">
                         <h4 data-toggle="collapse" data-target="#stacktrace-{{id}}">{{{title}}}</h4>
