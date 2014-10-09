@@ -108,8 +108,7 @@ public final class SpoonRunner {
 
       return parseOverallSuccess(summary);
     } finally {
-      //TODO: MEZ - More robust fix needed, this should be called but apparently interferee with other monitorning
-      //AndroidDebugBridge.terminate();
+      AndroidDebugBridge.terminate();
     }
   }
 
