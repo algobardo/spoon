@@ -105,7 +105,6 @@ public final class SpoonRunner {
       SpoonSummary summary = runTests(adb, serials);
       // ...and render to HTML
       new HtmlRenderer(summary, SpoonUtils.GSON, output, parsedArgs.noresultjson, parsedArgs.nohtml).render();
-
       return parseOverallSuccess(summary);
     } finally {
       AndroidDebugBridge.terminate();
