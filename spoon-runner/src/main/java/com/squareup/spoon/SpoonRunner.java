@@ -108,7 +108,8 @@ public final class SpoonRunner {
 
       return parseOverallSuccess(summary);
     } finally {
-      AndroidDebugBridge.terminate();
+      //TODO: MEZ - More robust fix needed, this should be called but apparently interferee with other monitorning
+      //AndroidDebugBridge.terminate();
     }
   }
 
@@ -465,6 +466,10 @@ public final class SpoonRunner {
             "\"&\" identifier of the run, shared by all the test cases in this spoon run ", help = true)
     public String runId;
 
+    @Parameter(names = { "--deviceSerial" }, description =
+            "\"&\" identifier of the device to run into ", help = true)
+    public String deviceSerial;
+
   }
 
   private static File cleanFile(String path) {
@@ -542,7 +547,7 @@ public final class SpoonRunner {
         return;
     }
 
-    SpoonRunner spoonRunner = new SpoonRunner.Builder() //
+    SpoonRunner.Builder tmpBuilder = new SpoonRunner.Builder() //
         .setTitle(parsedArgs.title)
         .setApplicationApk(parsedArgs.apk)
         .setInstrumentationApk(parsedArgs.testApk)
@@ -557,10 +562,21 @@ public final class SpoonRunner {
         .setClassName(parsedArgs.className)
         .setMethodName(parsedArgs.methodName)
         .setNoInstall(parsedArgs.noinstall)
-        .setRunId((parsedArgs.runId != null && !parsedArgs.equals("") ? parsedArgs.runId : "defaultid" ))
-        .setFilterLog(parsedArgs.filterLog)
+        .setRunId((parsedArgs.runId != null && !parsedArgs.runId.equals("") ? parsedArgs.runId : "defaultid" ))
+        .setFilterLog(parsedArgs.filterLog);
+        
+    SpoonRunner spoonRunner = null;
+
+    if(parsedArgs.deviceSerial != null && !parsedArgs.deviceSerial.equals("")) {
+      spoonRunner = tmpBuilder
+        .addDevice(parsedArgs.deviceSerial)
+        .build();
+    }
+    else {
+      spoonRunner = tmpBuilder
         .useAllAttachedDevices()
         .build();
+    }
 
     if (!spoonRunner.run(parsedArgs) && parsedArgs.failOnFailure) {
       System.exit(1);
