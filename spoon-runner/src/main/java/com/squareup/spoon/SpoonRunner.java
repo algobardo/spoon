@@ -107,6 +107,7 @@ public final class SpoonRunner {
       new HtmlRenderer(summary, SpoonUtils.GSON, output, parsedArgs.noresultjson, parsedArgs.nohtml).render();
       return parseOverallSuccess(summary);
     } finally {
+    	logDebug(true,"HHERE3");
       AndroidDebugBridge.terminate();
     }
   }
@@ -203,6 +204,7 @@ public final class SpoonRunner {
         }
       }
     }
+    logDebug(true,"parseOverallSuccess returns");
     return true;
   }
 
@@ -577,7 +579,16 @@ public final class SpoonRunner {
     }
 
     if (!spoonRunner.run(parsedArgs) && parsedArgs.failOnFailure) {
-      System.exit(1);
+    	logDebug(true,"calling system exit");
+    	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
+    	Runtime.getRuntime().halt(1);
+//    	System.exit(1);
+    }
+    else {
+    	logDebug(true,"calling system exit");
+    	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
+    	Runtime.getRuntime().halt(0);
+//    	System.exit(0);
     }
   }
 }
