@@ -59,16 +59,32 @@ public final class SpoonSummary {
   public SpoonSummary aggregate(SpoonSummary ss){
     Map<String, DeviceResult> results = new HashMap<String, DeviceResult>();
 
-      if(Sets.intersection(ss.results.keySet(),this.results.keySet()).size() != this.results.keySet().size())
-          throw new RuntimeException("The two results are incomparable, they need to be on the same device set");
-
-      Map<String, DeviceResult> newResults = new TreeMap<String, DeviceResult>();
-      for(String dev : ss.results.keySet()){
-          newResults.put(dev,this.results.get(dev).aggregate(ss.results.get(dev)));
+      if(!(ss.results.keySet().size()==1 && this.results.keySet().size()==1)) {
+          throw new RuntimeException("More than one device");
       }
+      
+      Map<String, DeviceResult> newResults = new TreeMap<String, DeviceResult>();
+      String d1 = (String)ss.results.keySet().toArray()[0];
+      String d2 = (String)this.results.keySet().toArray()[0];
+
+      newResults.put(d1,this.results.get(d2).aggregate(ss.results.get(d1)));
+      
       newResults = unmodifiableMap(newResults);
 
       return new SpoonSummary("Aggregation",this.testSize,this.started,this.duration+ss.duration,newResults);
+
+      // if(Sets.intersection(ss.results.keySet(),this.results.keySet()).size() != this.results.keySet().size())
+      //     throw new RuntimeException("The two results are incomparable, they need to be on the same device set");
+      
+      // Map<String, DeviceResult> newResults = new TreeMap<String, DeviceResult>();
+      // for(String dev : ss.results.keySet()){
+      //     newResults.put(dev,this.results.get(dev).aggregate(ss.results.get(dev)));
+      // }
+      // newResults = unmodifiableMap(newResults);
+
+      // return new SpoonSummary("Aggregation",this.testSize,this.started,this.duration+ss.duration,newResults);
+
+      
   }
 
   static class Builder {
