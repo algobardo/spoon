@@ -544,7 +544,7 @@ public final class SpoonRunner {
         catch (FileNotFoundException err){
             System.err.println(err);
         }
-        return;
+        Runtime.getRuntime().halt(0);
     }
 
     SpoonRunner.Builder tmpBuilder = new SpoonRunner.Builder() //
@@ -582,13 +582,13 @@ public final class SpoonRunner {
     	logDebug(true,"calling system exit");
     	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
     	Runtime.getRuntime().halt(1);
-//    	System.exit(1);
+   	  // System.exit(1);
     }
     else {
     	logDebug(true,"calling system exit");
     	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
     	Runtime.getRuntime().halt(0);
-//    	System.exit(0);
+   	// System.exit(0);
     }
   }
 }
