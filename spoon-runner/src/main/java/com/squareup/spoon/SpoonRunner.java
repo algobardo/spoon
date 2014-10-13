@@ -544,6 +544,7 @@ public final class SpoonRunner {
         catch (FileNotFoundException err){
             System.err.println(err);
         }
+        logDebug(true,"EXIT-HOOK");
         Runtime.getRuntime().halt(0);
     }
 
@@ -579,13 +580,13 @@ public final class SpoonRunner {
     }
 
     if (!spoonRunner.run(parsedArgs) && parsedArgs.failOnFailure) {
-    	logDebug(true,"calling system exit");
+    	logDebug(true,"EXIT-HOOK");
     	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
     	Runtime.getRuntime().halt(1);
    	  // System.exit(1);
     }
     else {
-    	logDebug(true,"calling system exit");
+    	logDebug(true,"EXIT-HOOK");
     	//TODO: WORKAROUND FOR FIXING VM NOT QUITTING
     	Runtime.getRuntime().halt(0);
    	// System.exit(0);
