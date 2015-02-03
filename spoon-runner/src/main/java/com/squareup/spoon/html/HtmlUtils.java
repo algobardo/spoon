@@ -128,12 +128,13 @@ final class HtmlUtils {
   static String prettifyMethodName(String methodName) {
     if (!HtmlRenderer.getPrettify()) return methodName;
 
-    if (!methodName.startsWith("test")) {
-      throw new IllegalArgumentException(
-          "Method name '" + methodName + "' does not start with 'test'.");
+    if (methodName.startsWith("test")) {
+      methodName = methodName.substring(4);
+    } else if (Character.isLowerCase(methodName.charAt(0))) {
+      methodName = Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1);
     }
     StringBuilder pretty = new StringBuilder();
-    String[] parts = methodName.substring(4).split("_");
+    String[] parts = methodName.split("_");
     for (String part : parts) {
       if ("".equals(part.trim())) {
         continue; // Skip empty parts.
