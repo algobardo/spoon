@@ -45,16 +45,16 @@ public final class DeviceTestResult {
   /** Execution status. */
   public Status getOverallStatus() {
     if(status.contains(Status.FAIL))
-    	return Status.FAIL;
+      return Status.FAIL;
     else if (status.contains(Status.ERROR))
-    	return Status.ERROR;
+      return Status.ERROR;
     else
-    	return status.get(0);
+      return status.get(0);
   }
   
   /** Execution status. */
   public List<Status> getStatus() {
-	  return status;
+    return status;
   }
 
   /** Exception thrown during execution. */
@@ -82,27 +82,27 @@ public final class DeviceTestResult {
   }
   
   public List<String> getRunIds() {
-	  return runIds;
+    return runIds;
   }
   
   public void merge(DeviceTestResult other) {
-  	this.exception.addAll(other.exception);
-  	this.duration += other.duration;
-  	LogCatMessage last = this.log.get(this.log.size()-1);
-  	String lastId = this.runIds.get(this.runIds.size()-1);
-  	try {
-  	java.lang.reflect.Field m = LogCatMessage.class.getDeclaredField("mMessage");
-  	m.setAccessible(true);
-  	m.set(last, last.getMessage() + " --- end of id " + lastId);
-  	}
-  	catch(Throwable e) {
-  		
-  	}
-  	
-  	this.log.addAll(other.log);
-  	this.status.addAll(other.status);
-  	this.screenshots.addAll(other.screenshots);
-  	this.runIds.addAll(other.runIds);
+    this.exception.addAll(other.exception);
+    this.duration += other.duration;
+
+    try {
+      LogCatMessage last = this.log.get(this.log.size()-1);
+      String lastId = this.runIds.get(this.runIds.size()-1);
+      java.lang.reflect.Field m = LogCatMessage.class.getDeclaredField("mMessage");
+      m.setAccessible(true);
+      m.set(last, last.getMessage() + " --- end of id " + lastId);
+    }
+    catch (Throwable e) {
+    }
+    
+    this.log.addAll(other.log);
+    this.status.addAll(other.status);
+    this.screenshots.addAll(other.screenshots);
+    this.runIds.addAll(other.runIds);
   }
 
   public static class Builder {
@@ -184,7 +184,7 @@ public final class DeviceTestResult {
       }
       
       if(exception.isEmpty())
-    	  exception.add(null);
+        exception.add(null);
       
       return new DeviceTestResult(status, exception, duration, screenshots, animatedGif, log, runIds);
     }
